@@ -4,7 +4,7 @@ import time as tm
 
 # Variaveis
 email = 'staffxcraft@gmail.com'
-password = 'dongls123'
+password =''
 
 
 with sync_playwright() as p:
