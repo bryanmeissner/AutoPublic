@@ -1,74 +1,60 @@
 from playwright.sync_api import sync_playwright
-import pyautogui as pag
-import time as tm
-
-# Variaveis
-email = 'staffxcraft@gmail.com'
-password =''
+from time import sleep
 
 
-with sync_playwright() as p:
-    # Configurações
-    browser = p.chromium.launch(headless=False)
-    page = browser.new_page()
+def programa():
 
-
-    # Faz login
-    page.goto('https://conta.olx.com.br/acesso/')
-    page.fill('input[type="email"]', email)
-    page.fill('input[type="password"]', password)
-    page.click('button[class="sc-kGXeez kgGtxX"]')
-
+    item_pesquisa = ""
+    ordenacao = True
+    valor_min_max = True
     
-    # Vai para a parte de anuncios
-    page.locator('a[class="sc-jDwBTQ fiHbAO"]').wait_for()
-    page.goto('https://www2.olx.com.br/ai/form/0/')
+    mercado_livre = "iphone-13"
+    amazon = "s?k=iphone+13"
+
+    if valor_min_max == True:
+        mercado_livre += '_PriceRange_1000-0_NoIndex_True'
+        amazon += '&rh=p_36%3A500000-'
+
+    if ordenacao == True:
+        mercado_livre += '_OrderId_PRICE_NoIndex_True'
+        amazon += '&s=price-asc-rank'
+        
 
 
-    # Preenche os campos
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=False)
+        page = browser.new_page()
 
-    # Titulo
-    page.locator('//*[@id="subject"]').wait_for()
-    page.fill('//*[@id="subject"]','teste') # Titulo
-
-    # Descricao
-    page.locator('//*[@id="body"]').wait_for()
-    page.fill('//*[@id="body"]', 'teste') # Descricao
-
-    # Categoria
-    page.locator('//*[@id="category_item-3000"]').wait_for()
-    page.click('//*[@id="category_item-3000"]')
-    page.locator('//*[@id="category_item-3020"]').wait_for()
-    page.click('//*[@id="category_item-3020"]')
+        # Vai até o Mercado Livre com o preço minimo e a ordenação
+        page.goto(f'https://lista.mercadolivre.com.br/{mercado_livre}')
 
 
-    # Tipo
-    page.locator('//*[@id="videogame_type"]').wait_for()
-    page.click('//*[@id="videogame_type"]')
-    page.keyboard.type('Console', delay= 100)
-    page.keyboard.press('Enter')
+        # Pega o nome do produto
+        nome_produtoM = page.locator('li.ui-search-layout__item:nth-child(1) > div > div > div:nth-child(2) > div:nth-child(1) > a > h2').all_text_contents()
+        
+        # Pega o valor do produto
+        valor_produtoM = page.locator('li.ui-search-layout__item:nth-child(1) > div > div > div:nth-child(2) > div:nth-child(2) > div:nth-child(1) > div:nth-child(1) > div > div > div > span:nth-child(1) > span:nth-child(2) > span:nth-child(2)').all_text_contents()
+        print(f'Mercado Livre: {nome_produtoM} - {valor_produtoM}')
+        
 
+        # Vai até a Amazon com o preço minimo e a ordenação
+        page.goto(f'https://www.amazon.com.br/{amazon}')
 
-    # Modelo
-    page.locator('//*[@id="videogame_model"]').wait_for()
-    page.click('//*[@id="videogame_model"]')
-    page.keyboard.type('Playstation 4', delay=100)
-    page.keyboard.press('Enter')
+        # Pega o nome do produto
+        nome_produtoA = page.locator('//*[@id="search"]/div[1]/div[1]/div/span[3]/div[2]/div[3]/div/div/div/div/div[2]/div[1]/h2/a/span').all_text_contents()
 
-
-    # Preco
-    page.locator('//*[@id="price_text"]').wait_for()
-    page.fill('//*[@id="price_text"]', '5000')
-
-
-    # Envia imagens
-    page.locator('input[class="ai-input ai-input--file box__field"]').wait_for()
-    page.click('input[class="ai-input ai-input--file box__field"]')
-    print('Passou')
-    page.on("filechooser", lambda file_chooser: file_chooser.set_files("resources\email.png"))
+        # Pega o valor do produto
+        valor_produtoA = page.locator('//*[@id="search"]/div[1]/div[1]/div/span[3]/div[2]/div[3]/div/div/div/div/div[2]/div[3]/div/div[1]/a/span/span[2]/span[2]').all_text_contents()
+        valor_produtoA += page.locator('//*[@id="search"]/div[1]/div[1]/div/span[3]/div[2]/div[3]/div/div/div/div/div[2]/div[3]/div/div[1]/a/span/span[2]/span[3]').all_text_contents()
 
 
 
-    
-    
-    tm.sleep(9000)
+
+
+
+        
+        print(f'Amazon: {nome_produtoA} - {valor_produtoA}')
+        browser.close()
+
+
+programa()
